@@ -3,6 +3,8 @@ FROM python:3.11-slim-buster
 # install pipenv and update pip
 RUN pip install --upgrade pipenv pip
 
+WORKDIR /app
+
 COPY . .
 
 # install requirements to system
