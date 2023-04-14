@@ -1,4 +1,5 @@
 from typing import List
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,7 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-sqlite_file_name = "database.db"
+# if the db directory does not exist, create it
+if not os.path.exists("db"):
+    os.mkdir("db")
+
+sqlite_file_name = "db/database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
 engine = create_engine(sqlite_url, echo=True)
