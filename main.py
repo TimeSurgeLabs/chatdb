@@ -31,10 +31,30 @@ def read_root():
     return {"Hello": "World"}
 
 
-# fix this
+@app.get("/get/{id}", response_model=Entry, description="Get an entry from the database via its id")
+def get(id: int, request: Request):
+    token = request.headers.get("Authorization", None)
+    if token is None:
+        return []
+    # remove the bearer part from the token
+    user_id = token.replace("Bearer ", "")
+    with Session(engine) as session:
+        # get the entry from the database
+        entry = session.get(Entry, id)
+        # check if the user_id matches
+        if entry.user_id == user_id:
+            # return the entry
+            return entry
+        else:
+            # return an empty list
+            return []
+
+
 @app.post("/search", response_model=List[Entry], description="Search for an entry in the database")
 def search(req: SearchReq, request: Request):
-    token = request.headers["Authorization"]
+    token = request.headers.get("Authorization", None)
+    if token is None:
+        return []
     # remove the bearer part from the token
     user_id = token.replace("Bearer ", "")
     with Session(engine) as session:
@@ -50,7 +70,9 @@ def search(req: SearchReq, request: Request):
 @app.post("/add", response_model=Entry, description="Add an entry to the database")
 def add(entry_req: EntryReq, request: Request):
     # get the bearer token from the request
-    token = request.headers["Authorization"]
+    token = request.headers.get("Authorization", None)
+    if token is None:
+        return []
     # remove the bearer part from the token
     user_id = token.replace("Bearer ", "")
     # get the user id from the token
@@ -67,7 +89,9 @@ def add(entry_req: EntryReq, request: Request):
 @app.post("/add_batch", response_model=List[Entry], description="Add a batch of entries to the database")
 def add_batch(entry_reqs: List[EntryReq], request: Request):
     # get the bearer token from the request
-    token = request.headers["Authorization"]
+    token = request.headers.get("Authorization", None)
+    if token is None:
+        return []
     # remove the bearer part from the token
     user_id = token.replace("Bearer ", "")
 
